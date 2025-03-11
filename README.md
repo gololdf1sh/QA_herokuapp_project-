@@ -72,11 +72,6 @@ npx playwright test --headed
 npx playwright test tests/updateTests.ts
 ```
 
-### 4. Запустити тести з фільтрацією тегів (майбутнє розширення)
-```bash
-npx playwright test --grep @smoke
-```
-
 ---
 
 ## Перегляд результатів
