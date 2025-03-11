@@ -1,4 +1,4 @@
-import {test, expect, Browser, Page} from '@playwright/test'; // Імпортуємо test-раннер та expect
+import {test, expect} from '@playwright/test'; // Імпортуємо test-раннер та expect
 import { BasicAuthPage } from '../pages/BasicAuthPage.page'; // Імпортуємо Page Object для Basic Auth сторінки
 import * as allure from 'allure-js-commons'; // Для генерації звітів Allure
 
