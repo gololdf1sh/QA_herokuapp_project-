@@ -1,5 +1,5 @@
 {
-  "name": "Kto_prochital_tot_dengi_na_banky_poloji_byd_chelovekom",
+  "name": "Heroku QA Playwright",
   "version": "1.0.0",
   "scripts": {
     "test": "npx playwright test tests",
