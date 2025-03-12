@@ -7,7 +7,6 @@ import { Page, Locator } from '@playwright/test';
  * - Навігація на сторінку.
  * - Отримання повідомлень про успіх / помилку.
  *
- * ❗️Контекст і авторизацію робимо на рівні тестів.
  */
 export class BasicAuthPage {
     private page: Page;
