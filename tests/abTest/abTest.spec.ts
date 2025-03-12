@@ -3,7 +3,7 @@ import * as allure from 'allure-js-commons'; // Підключаємо Allure д
 import { AbTestPage } from '../../src/pages/AbTestPage.page'; // Імпортуємо Page Object сторінки A/B Testing
 
 /**
- * Тестова сьют для перевірки роботи сторінки A/B Testing
+ * Тестова сьют для перевірки роботи сторінки A/B Testing TEST
  *
  * Мета: перевірити, що заголовок змінюється при очищенні кешу і куків браузера (A/B тестування)
  */
