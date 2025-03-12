@@ -1,5 +1,5 @@
 {
-  "name": "Heroku QA Playwright",
+  "name": "heroku-qa-playwright",
   "version": "1.0.0",
   "scripts": {
     "test": "npx playwright test tests",
