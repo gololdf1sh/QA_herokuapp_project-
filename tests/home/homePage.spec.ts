@@ -1,5 +1,5 @@
 import { test } from '@playwright/test'; // Імпортуємо Playwright test-раннер
-import { HomePage } from '../pages/HomePage.page'; // Імпортуємо Page Object для головної сторінки
+import { HomePage } from '../../src/pages/HomePage.page'; // Імпортуємо Page Object для головної сторінки
 import * as allure from "allure-js-commons"; // Імпортуємо Allure для генерації тестових звітів
 
 /**

@@ -1,5 +1,5 @@
 import { test } from '@playwright/test'; // Імпортуємо Playwright test-раннер
-import { BrokenImagesPage } from '../pages/BrokenImagesPage.page'; // Підключаємо Page Object для сторінки Broken Images
+import { BrokenImagesPage } from '../../src/pages/BrokenImagesPage.page'; // Підключаємо Page Object для сторінки Broken Images
 import * as allure from "allure-js-commons"; // Імпортуємо Allure для побудови тестових звітів
 
 /**

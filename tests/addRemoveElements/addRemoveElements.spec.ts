@@ -1,6 +1,7 @@
-import { test, expect } from '@playwright/test'; // Імпорт основних методів Playwright
+import { test } from '@playwright/test'; // Імпорт основних методів Playwright
 import * as allure from 'allure-js-commons';     // Імпорт Allure для звітності
-import { AddRemoveElementsPage } from '../pages/AddRemoveElementsPage.page'; // Імпорт Page Object
+import { AddRemoveElementsPage } from '../../src/pages/AddRemoveElementsPage.page'; // Імпорт Page Object
+import { testData } from '../../src/fixtures/testData';
 
 /**
  * ✅ Група тестів для функціональності "Add/Remove Elements"
@@ -8,13 +9,9 @@ import { AddRemoveElementsPage } from '../pages/AddRemoveElementsPage.page'; // 
 test.describe('Add/Remove Elements Tests', () => {
     let addRemoveElementsPage: AddRemoveElementsPage; // Змінна для сторінки з елементами
 
-    /**
-     * Константи, що визначають кількість елементів у сценарії тесту:
-     * - ELEMENTS_TO_ADD: скільки елементів додамо
-     * - ELEMENTS_TO_REMOVE: скільки з них видалимо
-     */
-    const ELEMENTS_TO_ADD = 8;
-    const ELEMENTS_TO_REMOVE = 7;
+    // Константи для додавання та видалення елементів, отримані з фікстур
+    const ELEMENTS_TO_ADD = testData.elementsToAdd; // Кількість елементів для додавання
+    const ELEMENTS_TO_REMOVE = testData.elementsToRemove; // Кількість елементів для видалення
 
     /**
      * Хук перед кожним тестом

@@ -14,6 +14,8 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests',
+  /*The output directory for files created during test execution  */
+  outputDir: './screenshots',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -34,6 +36,9 @@ export default defineConfig({
   ,
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
+    trace: 'on',
+    video: 'on',
+    screenshot: 'only-on-failure',
     baseURL: 'https://the-internet.herokuapp.com/',
     headless: false,
     viewport: process.env.CI ? {height: 1080, width: 1920} : null,
@@ -41,7 +46,6 @@ export default defineConfig({
     //baseURL: 'http://127.0.0.1:3000',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
   },
 
   /* Configure projects for major browsers */
