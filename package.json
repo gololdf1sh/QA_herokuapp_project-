@@ -10,7 +10,7 @@
     "allure:open": "allure open allure-report"
   },
   "keywords": [],
-  "author": "Chat GPT, not without help of God and main support - ",
+  "author": "Chat GPT, not without help of God and main support - Shrek ",
   "license": "ISC",
   "description": "Тестовий фреймворк Playwright для https://the-internet.herokuapp.com",
   "devDependencies": {
