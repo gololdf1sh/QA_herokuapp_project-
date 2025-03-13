@@ -7,42 +7,34 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  playwright-ci:            # 👈 нова зрозуміла назва job
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Node.js setup
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      # 3. Install dependencies
       - name: Install dependencies
         run: npm ci
 
-      # 4. Install Playwright Browsers
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      # 5. Run tests with xvfb-run
       - name: Run Playwright tests with Allure reporter
         run: xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' npx playwright test --reporter=list,allure-playwright
         continue-on-error: true
 
-      # 6. Install Allure CLI
       - name: Install Allure CLI
         run: npm install -g allure-commandline@2.20.1
 
-      # 7. Generate Allure Report
       - name: Generate Allure Report
         run: allure generate ./allure-results --clean -o ./allure-report
 
-      # 8. Deploy to GitHub Pages
       - name: Deploy Allure Report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
