@@ -24,4 +24,13 @@ test.describe('@auth @smoke Form Authentication', () => {
         await loginPage.login('tomsmith', 'invalidPassword');
         await loginPage.assertFlashMessageContains('Your password is invalid!');
     });
+
+    test('Логаут після успішного логіну', async () => {
+        await loginPage.login('tomsmith', 'SuperSecretPassword!');
+        await loginPage.assertFlashMessageContains('You logged into a secure area!');
+
+        await loginPage.logout();
+        await loginPage.assertFlashMessageContains('You logged out of the secure area!');
+    });
+
 });

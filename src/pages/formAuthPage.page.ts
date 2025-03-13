@@ -5,6 +5,7 @@ export class LoginPage {
     readonly usernameInput: Locator;
     readonly passwordInput: Locator;
     readonly loginButton: Locator;
+    readonly logoutButton: Locator;
     readonly flashMessage: Locator;
 
     constructor(page: Page) {
@@ -12,6 +13,7 @@ export class LoginPage {
         this.usernameInput = page.locator('#username');
         this.passwordInput = page.locator('#password');
         this.loginButton = page.locator('button[type="submit"]');
+        this.logoutButton = page.locator('a[href="/logout"]'); // 👈 додаємо логін-аут
         this.flashMessage = page.locator('#flash');
     }
 
@@ -23,6 +25,10 @@ export class LoginPage {
         await this.usernameInput.fill(username);
         await this.passwordInput.fill(password);
         await this.loginButton.click();
+    }
+
+    async logout() {
+        await this.logoutButton.click();
     }
 
     async assertFlashMessageContains(text: string) {
