@@ -1,4 +1,4 @@
-name: Playwright Tests with Allure Report
+name: Playwright Tests with Allure Report and GH Pages Deploy
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
 
       - name: Run Playwright tests with Allure reporter
         run: npx playwright test --reporter=list,allure-playwright
-        continue-on-error: true  # <- дозволяємо рухатись далі навіть якщо є фейли
+        continue-on-error: true
 
       - name: Install Allure CLI
         run: npm install -g allure-commandline@2.20.1
@@ -35,8 +35,9 @@ jobs:
       - name: Generate Allure Report
         run: allure generate ./allure-results --clean -o ./allure-report
 
-      - name: Upload Allure Report artifact
-        uses: actions/upload-artifact@v4
+      - name: Deploy Allure Report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          name: allure-report
-          path: allure-report
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
+          publish_branch: gh-pages
