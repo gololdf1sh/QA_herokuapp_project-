@@ -1,0 +1,2 @@
+Виконуємо клік правою кнопкою по hotSpot
+Отримано alert з текстом: "You selected a context menu"

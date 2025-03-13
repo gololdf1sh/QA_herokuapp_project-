@@ -1,0 +1,8 @@
+"Epic","Feature","Story","FAILED","BROKEN","PASSED","SKIPPED","UNKNOWN"
+"Authentication","Basic Auth","Invalid credentials","0","0","1","0","0"
+"UI Elements","Add/Remove Elements","","0","0","1","0","0"
+"Navigation","Main Page Links","","0","0","3","0","0"
+"UI Testing","A/B Testing","","0","0","1","0","0"
+"","","","0","0","10","0","0"
+"Authentication","Basic Auth","Valid credentials","0","0","1","0","0"
+"UI Testing","Images Validation","","0","0","1","0","0"
