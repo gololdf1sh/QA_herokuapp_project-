@@ -41,7 +41,7 @@ export default defineConfig({
     video: 'on',
     screenshot: 'only-on-failure',
     baseURL: 'https://the-internet.herokuapp.com/',
-    headless: true,
+    headless: false,
     viewport: process.env.CI ? {height: 1080, width: 1920} : null,
     /* Base URL to use in actions like `await page.goto('/')`. */
     //baseURL: 'http://127.0.0.1:3000',

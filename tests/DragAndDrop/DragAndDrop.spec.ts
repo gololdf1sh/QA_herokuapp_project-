@@ -1,22 +1,34 @@
 import { test } from '@playwright/test';
 import { DragAndDropPage } from '../../src/pages/DragAndDropPage.page';
 
-test.describe('Drag and Drop', () => {
+/**
+ * Тестова сьют для Drag and Drop Page
+ */
+test.describe('Drag And Drop Page', () => {
     let dragAndDropPage: DragAndDropPage;
 
     test.beforeEach(async ({ page }) => {
         dragAndDropPage = new DragAndDropPage(page);
-        await dragAndDropPage.goto();
     });
 
-    test('Користувач може перетягувати блок A на місце B', async () => {
-        // Початково перевіряємо, що A зліва
-        await dragAndDropPage.assertColumnOrder('A');
+    /**
+     * ✅ Тест: Перетягнути Box A у Box B
+     */
+    test('should drag Box A and drop into Box B', async () => {
+        await test.step('Перейти на сторінку Drag and Drop', async () => {
+            await dragAndDropPage.goto();
+        });
 
-        // Перетягуємо
-        await dragAndDropPage.dragAtoB();
+        await test.step('Перетягнути Box A у Box B', async () => {
+            await dragAndDropPage.dragAtoB();
+        });
 
-        // Тепер блок A повинен бути справа (тобто, B став першим)
-        await dragAndDropPage.assertColumnOrder('B');
+        await test.step('Перевірити, що Box A став B', async () => {
+            await dragAndDropPage.expectColumnAText('B');
+        });
+
+        await test.step('Перевірити, що Box B став A', async () => {
+            await dragAndDropPage.expectColumnBText('A');
+        });
     });
 });

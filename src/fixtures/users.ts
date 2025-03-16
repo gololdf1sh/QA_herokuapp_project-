@@ -4,7 +4,23 @@ export const users = {
         password: 'admin'
     },
     invalidAdmin: {
+        username: 'invalid',
+        password: 'invalid'
+    },
+    basicAuth: {
         username: 'admin',
-        password: 'wrong_password'
+        password: 'admin'
+    },
+    digestAuth: {
+        username: 'admin',
+        password: 'admin'
+    },
+    valid: {
+        username: 'tomsmith',
+        password: 'SuperSecretPassword!'
+    },
+    invalid: {
+        username: 'wronguser',
+        password: 'wrongpassword'
     }
 };

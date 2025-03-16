@@ -1,35 +1,30 @@
-import { test, expect } from '@playwright/test';
-import path from 'path';
+import { test } from '@playwright/test';
 import { FileDownloadPage } from '../../src/pages/FileDownloadPage.page';
 
-test.describe('File Download', () => {
+test.describe('File Download Page', () => {
     let fileDownloadPage: FileDownloadPage;
 
     test.beforeEach(async ({ page }) => {
         fileDownloadPage = new FileDownloadPage(page);
-        await fileDownloadPage.goto();
+
+        await test.step('Перейти на сторінку File Download', async () => {
+            await fileDownloadPage.goto();
+        });
     });
 
-    test('Користувач може завантажити файл', async ({ page }, testInfo) => {
-        // Папка для завантаження файлів
-        const downloadsPath = testInfo.outputPath('downloads');
+    test('Повинен завантажити файл і перевірити його існування', async () => {
+        let downloadedFilePath = '';
 
-        // Створюємо папку (якщо нема)
-        const fs = require('fs');
-        if (!fs.existsSync(downloadsPath)) {
-            fs.mkdirSync(downloadsPath);
-        }
+        await test.step('Завантажити перший доступний файл', async () => {
+            downloadedFilePath = await fileDownloadPage.downloadFirstFile();
+        });
 
-        const download = await fileDownloadPage.downloadFirstFile();
+        await test.step('Перевірити, що файл існує', async () => {
+            await fileDownloadPage.assertFileExists(downloadedFilePath);
+        });
 
-        const filePath = path.join(downloadsPath, download.suggestedFilename());
-
-        await fileDownloadPage.saveDownloadTo(download, filePath);
-
-        await fileDownloadPage.assertFileExists(filePath);
-
-        // ✅ Перевірка розміру файлу (опційно)
-        const stats = fs.statSync(filePath);
-        expect(stats.size).toBeGreaterThan(0);
+        await test.step('Перевірити, що файл не пустий', async () => {
+            await fileDownloadPage.assertFileNotEmpty(downloadedFilePath);
+        });
     });
 });

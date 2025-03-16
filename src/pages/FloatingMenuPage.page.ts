@@ -2,44 +2,56 @@ import { Page, Locator, expect } from '@playwright/test';
 
 export class FloatingMenuPage {
     readonly page: Page;
-    readonly floatingMenu: Locator;
-    readonly homeLink: Locator;
-    readonly newsLink: Locator;
-    readonly contactLink: Locator;
+    private floatingMenu: Locator;
+    private menuLinks: Locator;
 
     constructor(page: Page) {
         this.page = page;
         this.floatingMenu = page.locator('#menu');
-        this.homeLink = page.locator('#menu a[href="#home"]');
-        this.newsLink = page.locator('#menu a[href="#news"]');
-        this.contactLink = page.locator('#menu a[href="#contact"]');
+        this.menuLinks = page.locator('#menu a');
     }
 
-    async goto() {
+    /**
+     * Перехід на сторінку Floating Menu
+     */
+    async goto(): Promise<void> {
         await this.page.goto('https://the-internet.herokuapp.com/floating_menu');
     }
 
-    async scrollToBottom() {
-        await this.page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    }
-
-    async assertMenuIsVisible() {
+    /**
+     * Перевірка видимості меню
+     */
+    async assertMenuVisible(): Promise<void> {
         await expect(this.floatingMenu).toBeVisible();
     }
 
-    async clickHomeLink() {
-        await this.homeLink.click();
+    /**
+     * Прокрутка сторінки вниз
+     */
+    async scrollPageDown(): Promise<void> {
+        await this.page.evaluate(() => {
+            window.scrollBy(0, 1000);
+        });
     }
 
-    async clickNewsLink() {
-        await this.newsLink.click();
+    /**
+     * Клік по посиланню меню за назвою
+     * @param linkText Текст посилання (Home, News, Contact, About)
+     */
+    async clickMenuLink(linkText: string): Promise<void> {
+        const link = this.page.locator(`#menu a:has-text("${linkText}")`);
+        await link.click();
     }
 
-    async clickContactLink() {
-        await this.contactLink.click();
-    }
+    /**
+     * Перевірка наявності всіх пунктів меню
+     */
+    async assertAllMenuLinksVisible(): Promise<void> {
+        const menuItems = ['Home', 'News', 'Contact', 'About'];
 
-    async assertUrlContains(anchor: string) {
-        await expect(this.page).toHaveURL(new RegExp(`#${anchor}$`));
+        for (const item of menuItems) {
+            const link = this.page.locator(`#menu a:has-text("${item}")`);
+            await expect(link).toBeVisible();
+        }
     }
 }

@@ -1,37 +1,45 @@
 import { Page, Locator, expect } from '@playwright/test';
 
+/**
+ * Клас для взаємодії зі сторінкою Disappearing Elements
+ */
 export class DisappearingElementsPage {
     readonly page: Page;
-    readonly menuItems: Locator;
 
+    /**
+     * Локатор для пунктів меню
+     */
+    private menuItems: Locator;
+
+    /**
+     * Конструктор класу DisappearingElementsPage
+     * @param page - об'єкт Playwright Page
+     */
     constructor(page: Page) {
         this.page = page;
-        this.menuItems = page.locator('ul li');
+        this.menuItems = page.locator('ul li a');
     }
 
-    async goto() {
-        await this.page.goto('https://the-internet.herokuapp.com/disappearing_elements');
+    /**
+     * Перехід на сторінку Disappearing Elements
+     */
+    async goto(): Promise<void> {
+        await this.page.goto('/disappearing_elements');
     }
 
-    // Повертаємо список видимих пунктів меню
-    async getMenuItemsText(): Promise<string[]> {
-        const count = await this.menuItems.count();
-        const texts = [];
-        for (let i = 0; i < count; i++) {
-            texts.push(await this.menuItems.nth(i).innerText());
-        }
-        return texts;
+    /**
+     * Перевіряє наявність пункту меню за його текстом
+     * @param itemText - текст пункту меню (наприклад, 'Gallery')
+     */
+    async expectMenuItemVisible(itemText: string): Promise<void> {
+        const menuItem = this.page.locator(`ul li a:has-text("${itemText}")`);
+        await expect(menuItem).toBeVisible();
     }
 
-    // Перевіряємо наявність певного пункту меню
-    async assertMenuItemExists(itemText: string) {
-        const items = await this.getMenuItemsText();
-        expect(items).toContain(itemText);
-    }
-
-    // Перевіряємо, що пункту меню немає
-    async assertMenuItemNotExists(itemText: string) {
-        const items = await this.getMenuItemsText();
-        expect(items).not.toContain(itemText);
+    /**
+     * Перезавантажує сторінку
+     */
+    async reload(): Promise<void> {
+        await this.page.reload();
     }
 }

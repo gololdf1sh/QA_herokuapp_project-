@@ -1,31 +1,48 @@
 import { Page, Locator, expect } from '@playwright/test';
+import * as path from 'path';
 
 export class FileUploadPage {
     readonly page: Page;
-    readonly uploadInput: Locator;
-    readonly uploadButton: Locator;
-    readonly uploadedFiles: Locator;
+    private fileInput: Locator;
+    private uploadButton: Locator;
+    private uploadedFilesText: Locator;
 
     constructor(page: Page) {
         this.page = page;
-        this.uploadInput = page.locator('#file-upload');
-        this.uploadButton = page.locator('#file-submit');
-        this.uploadedFiles = page.locator('#uploaded-files');
+        this.fileInput = page.locator('input#file-upload'); // input type="file"
+        this.uploadButton = page.locator('input#file-submit'); // кнопка Upload
+        this.uploadedFilesText = page.locator('#uploaded-files'); // результат завантаження
     }
 
-    async goto() {
+    /**
+     * Переходимо на сторінку File Upload
+     */
+    async goto(): Promise<void> {
         await this.page.goto('https://the-internet.herokuapp.com/upload');
     }
 
-    async uploadFile(filePath: string) {
-        // Заповнюємо поле вибору файлу
-        await this.uploadInput.setInputFiles(filePath);
-        // Натискаємо кнопку Submit
+    /**
+     * Завантажуємо файл ➔ шлях відносно папки проекту
+     */
+    async uploadFile(fileName: string): Promise<void> {
+        const filePath = path.resolve(__dirname, '../../tests/testData/' + fileName);
+
+        // Передаємо шлях до input type="file"
+        await this.fileInput.setInputFiles(filePath);
+    }
+
+    /**
+     * Тиснемо кнопку Upload
+     */
+    async clickUpload(): Promise<void> {
         await this.uploadButton.click();
     }
 
-    async assertFileUploaded(fileName: string) {
-        // Перевіряємо, що ім'я завантаженого файлу відображається
-        await expect(this.uploadedFiles).toHaveText(fileName);
+    /**
+     * Перевіряємо, що файл був завантажений успішно
+     */
+    async assertUploadedFileName(expectedFileName: string): Promise<void> {
+        const actualFileName = await this.uploadedFilesText.textContent();
+        expect(actualFileName?.trim()).toBe(expectedFileName);
     }
 }

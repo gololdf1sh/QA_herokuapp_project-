@@ -1,37 +1,53 @@
 import { Page, Locator, expect } from '@playwright/test';
 
+/**
+ * Клас для взаємодії зі сторінкою Dynamic Content
+ */
 export class DynamicContentPage {
     readonly page: Page;
-    readonly rows: Locator;
+
+    /**
+     * Локатор для динамічного контенту
+     */
+    private contentRows: Locator;
 
     constructor(page: Page) {
         this.page = page;
-        this.rows = page.locator('#content > div.row');
+        this.contentRows = page.locator('#content .row');
     }
 
-    async goto() {
-        await this.page.goto('https://the-internet.herokuapp.com/dynamic_content');
+    /**
+     * Перехід на сторінку Dynamic Content
+     */
+    async goto(): Promise<void> {
+        await this.page.goto('/dynamic_content');
     }
 
-    async getTextsFromRows(): Promise<string[]> {
-        const count = await this.rows.count();
-        const texts = [];
-
-        for (let i = 0; i < count; i++) {
-            const text = await this.rows.nth(i).innerText();
-            texts.push(text.trim());
-        }
-
-        return texts;
+    /**
+     * Отримує текст контенту за індексом (0, 1, 2)
+     * @param index - індекс рядка
+     */
+    private async getRowText(index: number): Promise<string> {
+        return await this.contentRows.nth(index).textContent() ?? '';
     }
 
-    async refreshPage() {
+    /**
+     * Перевіряє, що контент змінюється після reload
+     * @param index - індекс рядка
+     */
+    async expectContentChangesAfterReload(index: number): Promise<void> {
+        const initialText = await this.getRowText(index);
         await this.page.reload();
+        const newText = await this.getRowText(index);
+
+        expect(initialText).not.toBe(newText);
     }
 
-    async assertContentChanged(initialTexts: string[], newTexts: string[]) {
-        // Перевіримо, що є хоча б одна зміна між двома наборами тексту
-        const hasChanged = initialTexts.some((text, index) => text !== newTexts[index]);
-        expect(hasChanged).toBeTruthy();
+    /**
+     * Перевіряє кількість рядків контенту ➔ гнучка перевірка
+     */
+    async expectContentRowsCountFlexible(): Promise<void> {
+        const count = await this.contentRows.count();
+        expect([3, 4]).toContain(count);
     }
 }

@@ -1,27 +1,58 @@
 import { Page, Locator, expect } from '@playwright/test';
 
+/**
+ * Клас для взаємодії зі сторінкою Drag And Drop
+ */
 export class DragAndDropPage {
     readonly page: Page;
-    readonly columnA: Locator;
-    readonly columnB: Locator;
 
+    /**
+     * Локатори для обох коробок (A та B)
+     */
+    private columnA: Locator;
+    private columnB: Locator;
+
+    /**
+     * Конструктор класу DragAndDropPage
+     * @param page - об'єкт Playwright Page
+     */
     constructor(page: Page) {
         this.page = page;
+
         this.columnA = page.locator('#column-a');
         this.columnB = page.locator('#column-b');
     }
 
-    async goto() {
-        await this.page.goto('https://the-internet.herokuapp.com/drag_and_drop');
+    /**
+     * Перехід на сторінку Drag and Drop
+     */
+    async goto(): Promise<void> {
+        await this.page.goto('/drag_and_drop');
     }
 
-    async dragAtoB() {
-        // Використовуємо dragAndDrop API (починаючи з Playwright 1.20+)
+    /**
+     * Перетягує елемент A у B
+     */
+    async dragAtoB(): Promise<void> {
+        // Примітка: в Playwright drag and drop працює нестабільно на цій сторінці через js реалізацію.
         await this.columnA.dragTo(this.columnB);
     }
 
-    async assertColumnOrder(expectedFirstColumnText: string) {
-        const columnAHeader = this.columnA.locator('header');
-        await expect(columnAHeader).toHaveText(expectedFirstColumnText);
+    /**
+     * Перевіряє, що Box A має конкретний заголовок
+     * @param expectedText - очікуваний текст (A або B)
+     */
+    async expectColumnAText(expectedText: string): Promise<void> {
+        const header = this.columnA.locator('header');
+        await expect(header).toHaveText(expectedText);
+    }
+
+    /**
+     * Перевіряє, що Box B має конкретний заголовок
+     * @param expectedText - очікуваний текст (A або B)
+     */
+    async expectColumnBText(expectedText: string): Promise<void> {
+        const header = this.columnB.locator('header');
+        await expect(header).toHaveText(expectedText);
     }
 }

@@ -1,26 +1,56 @@
 import { test } from '@playwright/test';
 import { EntryAdPage } from '../../src/pages/EntryAdPage.page';
 
-test.describe('Entry Ad', () => {
+/**
+ * Тестова сьют для Entry Ad Page
+ */
+test.describe('Entry Ad Page', () => {
     let entryAdPage: EntryAdPage;
 
     test.beforeEach(async ({ page }) => {
         entryAdPage = new EntryAdPage(page);
-        await entryAdPage.goto();
     });
 
-    test('Модалка зʼявляється при вході на сторінку', async () => {
-        await entryAdPage.assertModalVisible(true);
+    /**
+     * ✅ Тест: Модалка відображається при завантаженні сторінки
+     */
+    test('should display modal on page load', async () => {
+        await test.step('Перейти на сторінку Entry Ad', async () => {
+            await entryAdPage.goto();
+        });
+
+        await test.step('Перевірити, що модальне вікно відображається', async () => {
+            await entryAdPage.expectModalVisible();
+        });
     });
 
-    test('Можна закрити модалку', async () => {
-        await entryAdPage.closeModal();
-        await entryAdPage.assertModalVisible(false);
+    /**
+     * ✅ Тест: Можна закрити модальне вікно
+     */
+    test('should close modal window', async () => {
+        await test.step('Перейти на сторінку Entry Ad', async () => {
+            await entryAdPage.goto();
+        });
+
+        await test.step('Закрити модальне вікно', async () => {
+            await entryAdPage.closeModal();
+        });
     });
 
-    test('Можна відкрити модалку повторно через Click Here', async () => {
-        await entryAdPage.closeModal(); // Закриваємо модалку
-        await entryAdPage.triggerModalAgain(); // Викликаємо повторно
-        await entryAdPage.assertModalVisible(true); // Перевіряємо, що модалка знову з'явилась
+    /**
+     * ✅ Тест: Можна знову відкрити модальне вікно
+     */
+    test('should re-enable modal window', async () => {
+        await test.step('Перейти на сторінку Entry Ad', async () => {
+            await entryAdPage.goto();
+        });
+
+        await test.step('Закрити модальне вікно', async () => {
+            await entryAdPage.closeModal();
+        });
+
+        await test.step('Заново показати модальне вікно', async () => {
+            await entryAdPage.reEnableModal();
+        });
     });
 });
