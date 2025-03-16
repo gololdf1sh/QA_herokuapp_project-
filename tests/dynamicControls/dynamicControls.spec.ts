@@ -1,35 +1,85 @@
 import { test } from '@playwright/test';
 import { DynamicControlsPage } from '../../src/pages/DynamicControlsPage.page';
 
-test.describe('Dynamic Controls', () => {
+/**
+ * Тестова сьют для Dynamic Controls Page
+ */
+test.describe('Dynamic Controls Page', () => {
     let dynamicControlsPage: DynamicControlsPage;
 
     test.beforeEach(async ({ page }) => {
         dynamicControlsPage = new DynamicControlsPage(page);
-        await dynamicControlsPage.goto();
     });
 
-    test('Користувач може видалити чекбокс', async () => {
-        await dynamicControlsPage.removeCheckbox();
-        await dynamicControlsPage.assertMessageText("It's gone!");
-        await dynamicControlsPage.assertCheckboxVisible(false);
+    /**
+     * ✅ Тест: Видалити чекбокс
+     */
+    test('should remove checkbox after clicking remove button', async () => {
+        await test.step('Перейти на сторінку Dynamic Controls', async () => {
+            await dynamicControlsPage.goto();
+        });
+
+        await test.step('Натиснути кнопку Remove', async () => {
+            await dynamicControlsPage.clickRemoveAddButton();
+        });
+
+        await test.step('Перевірити, що чекбокс зник', async () => {
+            await dynamicControlsPage.expectCheckboxIsGone();
+        });
     });
 
-    test('Користувач може додати чекбокс', async () => {
-        await dynamicControlsPage.removeCheckbox();
-        await dynamicControlsPage.addCheckbox();
-        await dynamicControlsPage.assertMessageText("It's back!");
-        await dynamicControlsPage.assertCheckboxVisible(true);
+    /**
+     * ✅ Тест: Додати чекбокс назад
+     */
+    test('should add checkbox back after clicking add button', async () => {
+        await test.step('Перейти на сторінку Dynamic Controls', async () => {
+            await dynamicControlsPage.goto();
+        });
+
+        await test.step('Видалити чекбокс', async () => {
+            await dynamicControlsPage.clickRemoveAddButton();
+            await dynamicControlsPage.expectCheckboxIsGone();
+        });
+
+        await test.step('Додати чекбокс назад', async () => {
+            await dynamicControlsPage.clickRemoveAddButton();
+            await dynamicControlsPage.expectCheckboxIsBack();
+        });
     });
 
-    test('Користувач може ввімкнути текстове поле', async () => {
-        await dynamicControlsPage.enableInput();
-        await dynamicControlsPage.assertMessageText("It's enabled!");
+    /**
+     * ✅ Тест: Увімкнути input field
+     */
+    test('should enable input field after clicking enable button', async () => {
+        await test.step('Перейти на сторінку Dynamic Controls', async () => {
+            await dynamicControlsPage.goto();
+        });
+
+        await test.step('Натиснути кнопку Enable', async () => {
+            await dynamicControlsPage.clickEnableDisableButton();
+        });
+
+        await test.step('Перевірити, що input активний', async () => {
+            await dynamicControlsPage.expectInputIsEnabled();
+        });
     });
 
-    test('Користувач може вимкнути текстове поле', async () => {
-        await dynamicControlsPage.enableInput(); // Спочатку увімкнемо
-        await dynamicControlsPage.disableInput();
-        await dynamicControlsPage.assertMessageText("It's disabled!");
+    /**
+     * ✅ Тест: Вимкнути input field
+     */
+    test('should disable input field after clicking disable button', async () => {
+        await test.step('Перейти на сторінку Dynamic Controls', async () => {
+            await dynamicControlsPage.goto();
+        });
+
+        await test.step('Увімкнути input', async () => {
+            await dynamicControlsPage.clickEnableDisableButton();
+            await dynamicControlsPage.expectInputIsEnabled();
+        });
+
+        await test.step('Вимкнути input', async () => {
+            await dynamicControlsPage.clickEnableDisableButton();
+            await dynamicControlsPage.expectInputIsDisabled();
+        });
     });
 });

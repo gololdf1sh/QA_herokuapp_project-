@@ -1,27 +1,36 @@
-import { test, expect } from '@playwright/test';
-import { DigestAuthPage } from '../../src/pages/digestAuthPage.page';
+import { test } from '@playwright/test';
+import { DigestAuthPage } from '../../src/pages/DigestAuthPage.page';
+import { users } from '../../src/fixtures/users';
 
-test.describe('Digest Authentication Page', () => {
+/**
+ * Тестова сьют для Digest Auth Page
+ */
+test.describe('Digest Auth Page', () => {
+    let digestAuthPage: DigestAuthPage;
 
-    test('Успішний доступ через Digest Auth', async ({ browser }) => {
+    test.beforeEach(async ({ page }) => {
+        digestAuthPage = new DigestAuthPage(page);
+    });
 
-        const context = await browser.newContext({
-            httpCredentials: {
-                username: 'admin',
-                password: 'admin'
-            }
+    /**
+     * ✅ Позитивний тест: успішна авторизація
+     */
+    test('should authenticate successfully with valid credentials', async () => {
+        await test.step('Перейти на Digest Auth сторінку з валідними даними', async () => {
+            await digestAuthPage.goto(users.digestAuth.username, users.digestAuth.password);
         });
 
-        const page = await context.newPage();
-        const digestAuthPage = new DigestAuthPage(page);
+        await test.step('Перевірити повідомлення про успішну авторизацію', async () => {
+            await digestAuthPage.expectSuccessMessage();
+        });
+    });
 
-        await digestAuthPage.navigate();
-
-        const message = await digestAuthPage.getSuccessMessage();
-
-        // Перевіряємо саме повідомлення в абзаці <p>
-        expect(message).toContain('Congratulations! You must have the proper credentials.');
-
-        await context.close();
+    /**
+     * ❌ Негативний тест: неуспішна авторизація
+     */
+    test('should not authenticate with invalid credentials', async () => {
+        await test.step('Перевірити статус відповіді при неправильних даних (401 Unauthorized)', async () => {
+            await digestAuthPage.expectUnauthorized(users.invalidAdmin.username, users.invalidAdmin.password);
+        });
     });
 });

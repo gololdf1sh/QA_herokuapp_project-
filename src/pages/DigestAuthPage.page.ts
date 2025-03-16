@@ -1,32 +1,32 @@
 import { Page, Locator, expect } from '@playwright/test';
 
 /**
- * Клас для взаємодії зі сторінкою Basic Auth
+ * Клас для взаємодії зі сторінкою Digest Auth
  */
-export class BasicAuthPage {
+export class DigestAuthPage {
     readonly page: Page;
 
     /**
-     * Локатор повідомлення про успішну авторизацію
+     * Локатор для повідомлення про успішну авторизацію
      */
     private successMessage: Locator;
 
     /**
-     * Конструктор класу BasicAuthPage
+     * Конструктор класу DigestAuthPage
      * @param page - об'єкт Playwright Page
      */
     constructor(page: Page) {
         this.page = page;
-        this.successMessage = page.locator('p');
+        this.successMessage = page.locator('div.example p');
     }
 
     /**
-     * Перехід на сторінку Basic Auth з авторизацією
+     * Перехід на сторінку Digest Auth з авторизацією
      * @param username - Ім'я користувача
      * @param password - Пароль
      */
     async goto(username: string, password: string): Promise<void> {
-        const authUrl = `https://${username}:${password}@the-internet.herokuapp.com/basic_auth`;
+        const authUrl = `https://${username}:${password}@the-internet.herokuapp.com/digest_auth`;
         await this.page.goto(authUrl);
     }
 
@@ -39,12 +39,12 @@ export class BasicAuthPage {
     }
 
     /**
-     * Перевіряє статус-код при неуспішній авторизації
+     * Перевіряє статус-код при неправильних даних (401)
      * @param username - Ім'я користувача
      * @param password - Пароль
      */
     async expectUnauthorized(username: string, password: string): Promise<void> {
-        const authUrl = `https://${username}:${password}@the-internet.herokuapp.com/basic_auth`;
+        const authUrl = `https://${username}:${password}@the-internet.herokuapp.com/digest_auth`;
 
         const response = await this.page.goto(authUrl);
         expect(response?.status()).toBe(401);

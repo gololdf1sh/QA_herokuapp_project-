@@ -1,65 +1,54 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
 /**
  * Клас для взаємодії зі сторінкою Broken Images
  */
 export class BrokenImagesPage {
-    page: Page;          // Об'єкт сторінки Playwright
-    private images: Locator;     // Локатор для всіх зображень <img> на сторінці
+    readonly page: Page;
 
     /**
-     * Ініціалізація класу BrokenImagesPage
-     * @param page - об'єкт сторінки Playwright
+     * Локатор для всіх зображень на сторінці
+     */
+    private images: Locator;
+
+    /**
+     * Конструктор класу BrokenImagesPage
+     * @param page - об'єкт Playwright Page
      */
     constructor(page: Page) {
         this.page = page;
 
-        // Локатор для всіх тегів <img> на сторінці
-        this.images = this.page.locator('img');
+        // Локатор для всіх <img> на сторінці
+        this.images = page.locator('img');
     }
 
     /**
-     * Перехід на сторінку зі зламаними зображеннями
+     * Перехід на сторінку Broken Images
      */
     async goto(): Promise<void> {
         await this.page.goto('/broken_images');
     }
 
     /**
-     * Перевірка всіх зображень на сторінці на наявність помилок завантаження
-     *
-     * Логіка:
-     *  - Отримуємо всі зображення
-     *  - Виконуємо HTTP-запит до кожного src
-     *  - Якщо статус відповіді не 200 — зображення вважається зламаним
-     *
-     * @returns void
+     * Перевірка всіх зображень на наявність пошкоджених (broken)
+     * @param expectedBrokenCount - очікувана кількість зламаних зображень
      */
-    async checkBrokenImages(): Promise<void> {
-        // Отримуємо список елементів <img> на сторінці
-        const imageElements = await this.images.all();
+    async expectBrokenImages(expectedBrokenCount: number): Promise<void> {
+        const imageCount = await this.images.count();
+        let brokenImages = 0;
 
-        // Перебираємо кожне зображення у списку
-        for (const img of imageElements) {
-            const imgSrc = await img.getAttribute('src'); // Отримуємо значення атрибута src
+        for (let i = 0; i < imageCount; i++) {
+            const img = this.images.nth(i);
+            const isImageBroken = await img.evaluate((node: HTMLImageElement) => {
+                return !node.complete || typeof node.naturalWidth === 'undefined' || node.naturalWidth === 0;
+            });
 
-            if (!imgSrc) {
-                console.log('⚠️ Зображення не має атрибута src');
-                continue; // Пропускаємо, якщо src не заданий
-            }
-
-            // Виконуємо HTTP GET-запит до src зображення
-            const response = await this.page.request.get(imgSrc);
-
-            // Отримуємо HTTP-статус відповіді
-            const status = response.status();
-
-            // Логіку можна замінити на expect, але наразі просто лог
-            if (status !== 200) {
-                console.log(`❌ Зображення ${imgSrc} не завантажено -> Статус: ${status}`);
-            } else {
-                console.log(`✅ Зображення ${imgSrc} успішно завантажено`);
+            if (isImageBroken) {
+                brokenImages++;
             }
         }
+
+        // Перевірка кількості зламаних зображень
+        expect(brokenImages).toBe(expectedBrokenCount);
     }
 }

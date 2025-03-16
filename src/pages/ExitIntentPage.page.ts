@@ -2,19 +2,25 @@ import { Page, Locator, expect } from '@playwright/test';
 
 export class ExitIntentPage {
     readonly page: Page;
-    readonly modal: Locator;
-    readonly modalCloseButton: Locator;
+    private modal: Locator;
+    private modalCloseButton: Locator;
 
     constructor(page: Page) {
         this.page = page;
-        this.modal = page.locator('.modal');
-        this.modalCloseButton = page.locator('.modal-footer p');
+        this.modal = page.locator('.modal'); // Локатор модалки
+        this.modalCloseButton = page.locator('.modal-footer p'); // Кнопка закриття
     }
 
-    async goto() {
+    /**
+     * Переходимо на сторінку Exit Intent
+     */
+    async goto(): Promise<void> {
         await this.page.goto('https://the-internet.herokuapp.com/exit_intent');
     }
 
+    /**
+     * Тригеримо Exit Intent шляхом імітації руху мишки
+     */
     async triggerExitIntent() {
         // Додаємо невелику затримку для надійності
         await this.page.waitForTimeout(500);
@@ -23,15 +29,28 @@ export class ExitIntentPage {
         await this.page.mouse.move(100, -10); // Тепер вище за межу екрану ➜ викликає exit intent
     }
 
-    async closeModal() {
-        await this.modalCloseButton.click();
+    /**
+     * Закриваємо модальне вікно
+     */
+    async closeModal(): Promise<void> {
+        await this.modalCloseButton.click(); // Клік на кнопку "Close"
     }
 
-    async assertModalVisible(visible: boolean) {
+    /**
+     * Асерт: чи модальне вікно відображається / приховано
+     * @param visible - true, якщо очікуємо видимість; false - якщо прихованість
+     */
+    async assertModalVisible(visible: boolean): Promise<void> {
         if (visible) {
-            await expect(this.modal).toBeVisible();
+            await expect(this.modal).toBeVisible(); // Очікуємо, що модалка видима
         } else {
-            await expect(this.modal).toBeHidden();
+            await expect(this.modal).toBeHidden(); // Очікуємо, що модалка прихована
         }
     }
 }
+
+
+
+
+
+

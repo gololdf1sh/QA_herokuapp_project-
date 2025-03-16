@@ -1,45 +1,53 @@
 import { Page, Locator, expect } from '@playwright/test';
 
+/**
+ * Клас для взаємодії зі сторінкою Dynamic Loading
+ */
 export class DynamicLoadingPage {
     readonly page: Page;
-    readonly example1Link: Locator;
-    readonly example2Link: Locator;
-    readonly startButton: Locator;
-    readonly loadingSpinner: Locator;
-    readonly loadedText: Locator;
+
+    private startButton: Locator;
+    private loadingIndicator: Locator;
+    private loadedContent: Locator;
 
     constructor(page: Page) {
         this.page = page;
-        this.example1Link = page.locator('a[href="/dynamic_loading/1"]');
-        this.example2Link = page.locator('a[href="/dynamic_loading/2"]');
+
         this.startButton = page.locator('#start button');
-        this.loadingSpinner = page.locator('#loading');
-        this.loadedText = page.locator('#finish h4');
+        this.loadingIndicator = page.locator('#loading');
+        this.loadedContent = page.locator('#finish h4');
     }
 
-    async goto() {
-        await this.page.goto('https://the-internet.herokuapp.com/dynamic_loading');
+    /**
+     * Перехід на сторінку Dynamic Loading ➔ варіант 1 або 2
+     * @param exampleNumber - номер прикладу (1 або 2)
+     */
+    async goto(exampleNumber: number): Promise<void> {
+        await this.page.goto(`/dynamic_loading/${exampleNumber}`);
     }
 
-    async goToExample(exampleNumber: number) {
-        if (exampleNumber === 1) {
-            await this.example1Link.click();
-        } else if (exampleNumber === 2) {
-            await this.example2Link.click();
-        } else {
-            throw new Error('Invalid example number');
-        }
-    }
-
-    async startLoading() {
+    /**
+     * Натискає кнопку Start і чекає на завершення завантаження
+     * @param exampleNumber - номер прикладу (1 або 2)
+     */
+    async clickStartAndWaitForContent(exampleNumber: number): Promise<void> {
         await this.startButton.click();
+
+        // Чекаємо появи лоадера
+        await expect(this.loadingIndicator).toBeVisible();
+
+        // Чекаємо зникнення лоадера ➔ waitForSelector краще працює в цьому кейсі
+        await this.page.waitForSelector('#loading', { state: 'hidden', timeout: 10000 });
+
+        // Перевіряємо, що контент з'явився
+        await expect(this.loadedContent).toBeVisible();
     }
 
-    async waitForLoadingToFinish() {
-        await this.loadingSpinner.waitFor({ state: 'hidden' });
-    }
-
-    async assertLoadedText(expectedText: string) {
-        await expect(this.loadedText).toHaveText(expectedText);
+    /**
+     * Перевіряє текст завантаженого контенту
+     * @param expectedText - очікуваний текст
+     */
+    async expectLoadedContentText(expectedText: string): Promise<void> {
+        await expect(this.loadedContent).toHaveText(expectedText);
     }
 }

@@ -1,21 +1,39 @@
 import { test } from '@playwright/test';
 import { DynamicContentPage } from '../../src/pages/DynamicContentPage.page';
 
-test.describe('Dynamic Content', () => {
+/**
+ * Тестова сьют для Dynamic Content Page
+ */
+test.describe('Dynamic Content Page', () => {
     let dynamicContentPage: DynamicContentPage;
 
     test.beforeEach(async ({ page }) => {
         dynamicContentPage = new DynamicContentPage(page);
-        await dynamicContentPage.goto();
     });
 
-    test('Контент змінюється при оновленні сторінки', async () => {
-        const initialTexts = await dynamicContentPage.getTextsFromRows();
+    /**
+     * ✅ Тест: Гнучка перевірка кількості рядків контенту
+     */
+    test('should display 3 or 4 content rows', async () => {
+        await test.step('Перейти на сторінку Dynamic Content', async () => {
+            await dynamicContentPage.goto();
+        });
 
-        await dynamicContentPage.refreshPage();
+        await test.step('Перевірити кількість рядків контенту (3 або 4)', async () => {
+            await dynamicContentPage.expectContentRowsCountFlexible();
+        });
+    });
 
-        const newTexts = await dynamicContentPage.getTextsFromRows();
+    /**
+     * ✅ Тест: Контент змінюється після reload
+     */
+    test('should change content after reload', async () => {
+        await test.step('Перейти на сторінку Dynamic Content', async () => {
+            await dynamicContentPage.goto();
+        });
 
-        await dynamicContentPage.assertContentChanged(initialTexts, newTexts);
+        await test.step('Перевірити, що контент першого рядка змінюється після reload', async () => {
+            await dynamicContentPage.expectContentChangesAfterReload(0);
+        });
     });
 });

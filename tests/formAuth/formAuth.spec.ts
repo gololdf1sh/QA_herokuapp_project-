@@ -1,36 +1,87 @@
 import { test } from '@playwright/test';
-import { LoginPage } from '../../src/pages/formAuthPage.page';
+import { FormAuthPage } from '../../src/pages/FormAuthPage.page';
+import { users } from '../../src/fixtures/users';
 
-// Allure метки для організації
-test.describe('@auth @smoke Form Authentication', () => {
-    let loginPage: LoginPage;
+test.describe('Form Authentication Page', () => {
+    let formAuthPage: FormAuthPage;
 
     test.beforeEach(async ({ page }) => {
-        loginPage = new LoginPage(page);
-        await loginPage.goto();
+        formAuthPage = new FormAuthPage(page);
+
+        await test.step('Перейти на сторінку логіну', async () => {
+            await formAuthPage.goto();
+        });
     });
 
-    test('Успішний логін з валідними даними', async () => {
-        await loginPage.login('tomsmith', 'SuperSecretPassword!');
-        await loginPage.assertFlashMessageContains('You logged into a secure area!');
+    /**
+     * ✅ Тест 1: Успішна авторизація
+     */
+    test('Повинен залогінитися з валідними даними', async () => {
+        await test.step('Виконати логін з валідними даними', async () => {
+            await formAuthPage.login(users.valid.username, users.valid.password);
+        });
+
+        await test.step('Перевірити наявність кнопки Logout', async () => {
+            await formAuthPage.assertLogoutButtonVisible();
+        });
+
+        await test.step('Перевірити повідомлення про успіх', async () => {
+            await formAuthPage.assertFlashMessageContains('You logged into a secure area!');
+        });
     });
 
-    test('Невалідний логін повертає помилку', async () => {
-        await loginPage.login('invalidUser', 'SuperSecretPassword!');
-        await loginPage.assertFlashMessageContains('Your username is invalid!');
+    /**
+     * ✅ Тест 2: Невдала авторизація
+     */
+    test('Не повинен залогінитися з невалідними даними', async () => {
+        await test.step('Виконати логін з невалідними даними', async () => {
+            await formAuthPage.login(users.invalid.username, users.invalid.password);
+        });
+
+        await test.step('Перевірити, що Logout відсутній', async () => {
+            await formAuthPage.assertLogoutButtonHidden();
+        });
+
+        await test.step('Перевірити повідомлення про помилку', async () => {
+            await formAuthPage.assertFlashMessageContains('Your username is invalid!');
+        });
     });
 
-    test('Невалідний пароль повертає помилку', async () => {
-        await loginPage.login('tomsmith', 'invalidPassword');
-        await loginPage.assertFlashMessageContains('Your password is invalid!');
+    /**
+     * ✅ Тест 3: Logout ➔ перевірка виходу після логіну
+     */
+    test('Повинен розлогінитися після натискання Logout', async () => {
+        await test.step('Логін з валідними даними', async () => {
+            await formAuthPage.login(users.valid.username, users.valid.password);
+        });
+
+        await test.step('Перевірити наявність кнопки Logout', async () => {
+            await formAuthPage.assertLogoutButtonVisible();
+        });
+
+        await test.step('Виконати Logout', async () => {
+            await formAuthPage.logout();
+        });
+
+        await test.step('Перевірити повідомлення про Logout', async () => {
+            await formAuthPage.assertFlashMessageContains('You logged out of the secure area!');
+        });
+
+        await test.step('Перевірити, що кнопка Logout більше не відображається', async () => {
+            await formAuthPage.assertLogoutButtonHidden();
+        });
     });
 
-    test('Логаут після успішного логіну', async () => {
-        await loginPage.login('tomsmith', 'SuperSecretPassword!');
-        await loginPage.assertFlashMessageContains('You logged into a secure area!');
+    /**
+     * ✅ Тест 4: Перевірка лише повідомлення (окремий тест)
+     */
+    test('Повинен показувати коректне повідомлення після логіну', async () => {
+        await test.step('Виконати логін', async () => {
+            await formAuthPage.login(users.valid.username, users.valid.password);
+        });
 
-        await loginPage.logout();
-        await loginPage.assertFlashMessageContains('You logged out of the secure area!');
+        await test.step('Перевірити повідомлення', async () => {
+            await formAuthPage.assertFlashMessageContains('You logged into a secure area!');
+        });
     });
-
 });
