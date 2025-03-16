@@ -1,10 +1,14 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { Page, expect, Locator } from '@playwright/test';
 
+/**
+ * Клас для взаємодії зі сторінкою Geolocation
+ */
 export class GeolocationPage {
     readonly page: Page;
-    readonly whereAmIButton: Locator;
-    readonly latitudeText: Locator;
-    readonly longitudeText: Locator;
+
+    private whereAmIButton: Locator;
+    private latitudeText: Locator;
+    private longitudeText: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -13,27 +17,52 @@ export class GeolocationPage {
         this.longitudeText = page.locator('#long-value');
     }
 
-    async goto() {
+    /**
+     * Перейти на сторінку Geolocation
+     */
+    async goto(): Promise<void> {
         await this.page.goto('https://the-internet.herokuapp.com/geolocation');
     }
 
-    async clickWhereAmI() {
+    /**
+     * Натискає на кнопку "Where am I?"
+     */
+    async clickWhereAmI(): Promise<void> {
         await this.whereAmIButton.click();
     }
 
+    /**
+     * Отримати значення широти
+     */
     async getLatitude(): Promise<string> {
         return await this.latitudeText.innerText();
     }
 
+    /**
+     * Отримати значення довготи
+     */
     async getLongitude(): Promise<string> {
         return await this.longitudeText.innerText();
     }
 
-    async assertCoordinates(expectedLat: string, expectedLong: string) {
+    /**
+     * Перевіряє, що координати відображаються на сторінці
+     */
+    async expectCoordinatesAreVisible(): Promise<void> {
+        await expect(this.latitudeText, 'Latitude is not visible').toBeVisible();
+        await expect(this.longitudeText, 'Longitude is not visible').toBeVisible();
+    }
+
+    /**
+     * Перевіряє координати широти та довготи
+     * @param expectedLat Очікувана широта
+     * @param expectedLong Очікувана довгота
+     */
+    async expectCoordinates(expectedLat: string, expectedLong: string): Promise<void> {
         const lat = await this.getLatitude();
         const long = await this.getLongitude();
 
-        expect(lat).toBe(expectedLat);
-        expect(long).toBe(expectedLong);
+        await expect(lat, 'Latitude does not match').toBe(expectedLat);
+        await expect(long, 'Longitude does not match').toBe(expectedLong);
     }
 }

@@ -1,9 +1,14 @@
 import { Page, Locator, expect } from '@playwright/test';
 
+/**
+ * Клас для взаємодії зі сторінкою Status Codes
+ */
 export class StatusCodesPage {
     readonly page: Page;
-    readonly statusLinks: Locator;
-    readonly statusText: Locator;
+
+    // Приватні локатори
+    private statusLinks: Locator;
+    private statusText: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -11,21 +16,47 @@ export class StatusCodesPage {
         this.statusText = page.locator('.example p');
     }
 
-    async goto() {
+    /**
+     * Перехід на сторінку Status Codes
+     */
+    async goto(): Promise<void> {
         await this.page.goto('https://the-internet.herokuapp.com/status_codes');
     }
 
-    async clickStatusCodeLink(statusCode: string) {
+    /**
+     * Клік по лінку статусу за кодом (наприклад, 404)
+     * @param statusCode Код статусу (наприклад, "404")
+     */
+    async clickStatusCodeLink(statusCode: string): Promise<void> {
         const link = this.statusLinks.filter({ hasText: statusCode });
-        await expect(link).toBeVisible();
+        await expect(link, `Посилання з кодом ${statusCode} не знайдено`).toBeVisible();
         await link.click();
     }
 
-    async assertStatusTextContains(expectedText: string) {
-        await expect(this.statusText).toContainText(expectedText);
+    /**
+     * Перевірити, що текст містить очікуване повідомлення
+     * @param expectedText Очікуваний фрагмент тексту
+     */
+    async expectStatusTextContains(expectedText: string): Promise<void> {
+        await expect(this.statusText, 'Текст не містить очікуваного фрагменту')
+            .toContainText(expectedText);
     }
 
-    async goBack() {
+    /**
+     * Повернутись назад до списку статус кодів
+     */
+    async goBack(): Promise<void> {
         await this.page.goBack();
+    }
+
+    /**
+     * Повна дія: клікнути по коду, перевірити текст і повернутись назад
+     * @param statusCode Код статусу (наприклад, "404")
+     * @param expectedText Очікуваний текст для перевірки
+     */
+    async clickStatusCodeAndExpect(statusCode: string, expectedText: string): Promise<void> {
+        await this.clickStatusCodeLink(statusCode);
+        await this.expectStatusTextContains(expectedText);
+        await this.goBack();
     }
 }

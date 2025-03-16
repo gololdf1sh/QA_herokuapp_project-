@@ -1,29 +1,35 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { HoversPage } from '../../src/pages/HoversPage.page';
 
+/**
+ * Тестова сьют для сторінки Hovers
+ */
 test.describe('Hovers Page', () => {
     let hoversPage: HoversPage;
 
     test.beforeEach(async ({ page }) => {
         hoversPage = new HoversPage(page);
-        await hoversPage.goto();
+
+        await test.step('Перейти на сторінку Hovers', async () => {
+            await hoversPage.goto();
+        });
     });
 
-    test('Навели на першу картинку, з\'явився підпис та кнопка', async () => {
-        await hoversPage.hoverOverFigure(0); // перша картинка
-        await hoversPage.assertCaptionVisible(0);
-        await hoversPage.assertCaptionContains(0, 'name: user1');
+    test('should display caption for the first figure when hovered', async () => {
+        await test.step('Навести курсор на першу картинку і перевірити підпис', async () => {
+            await hoversPage.hoverOverFigureAndExpectCaption(0, 'name: user1');
+        });
     });
 
-    test('Навели на другу картинку, з\'явився підпис та кнопка', async () => {
-        await hoversPage.hoverOverFigure(1);
-        await hoversPage.assertCaptionVisible(1);
-        await hoversPage.assertCaptionContains(1, 'name: user2');
+    test('should display caption for the second figure when hovered', async () => {
+        await test.step('Навести курсор на другу картинку і перевірити підпис', async () => {
+            await hoversPage.hoverOverFigureAndExpectCaption(1, 'name: user2');
+        });
     });
 
-    test('Навели на третю картинку, з\'явився підпис та кнопка', async () => {
-        await hoversPage.hoverOverFigure(2);
-        await hoversPage.assertCaptionVisible(2);
-        await hoversPage.assertCaptionContains(2, 'name: user3');
+    test('should display caption for the third figure when hovered', async () => {
+        await test.step('Навести курсор на третю картинку і перевірити підпис', async () => {
+            await hoversPage.hoverOverFigureAndExpectCaption(2, 'name: user3');
+        });
     });
 });
