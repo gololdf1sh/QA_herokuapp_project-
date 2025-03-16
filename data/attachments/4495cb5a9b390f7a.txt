@@ -1,0 +1,4 @@
+Initial count: 2
+After scroll 1, paragraphs count: 3
+After scroll 2, paragraphs count: 4
+After scroll 3, paragraphs count: 5

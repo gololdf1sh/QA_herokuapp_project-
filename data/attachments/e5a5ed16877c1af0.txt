@@ -1,0 +1,2 @@
+❌ Text did not match after 10 attempts. Last attempt: "This example demonstrates a typo being introduced. It does it randomly on each page load."
+⚠️ Тест пройшов з помилкою у тексті: "This example demonstrates a typo being introduced. It does it randomly on each page load."

@@ -1,0 +1,81 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: Digest Auth Page >> should not authenticate with invalid credentials
+- Location: /home/runner/work/QA_herokuapp_project-/QA_herokuapp_project-/tests/digestAuth/digestAuth.spec.ts:31:9
+
+# Error details
+
+```
+Error: page.goto: net::ERR_INVALID_AUTH_CREDENTIALS at https://invalid:invalid@the-internet.herokuapp.com/digest_auth
+Call log:
+  - navigating to "https://invalid:invalid@the-internet.herokuapp.com/digest_auth", waiting until "load"
+
+    at DigestAuthPage.expectUnauthorized (/home/runner/work/QA_herokuapp_project-/QA_herokuapp_project-/src/pages/DigestAuthPage.page.ts:49:42)
+    at /home/runner/work/QA_herokuapp_project-/QA_herokuapp_project-/tests/digestAuth/digestAuth.spec.ts:33:34
+    at /home/runner/work/QA_herokuapp_project-/QA_herokuapp_project-/tests/digestAuth/digestAuth.spec.ts:32:20
+```
+
+# Test source
+
+```ts
+   1 | import { Page, Locator, expect } from '@playwright/test';
+   2 |
+   3 | /**
+   4 |  * Клас для взаємодії зі сторінкою Digest Auth
+   5 |  */
+   6 | export class DigestAuthPage {
+   7 |     readonly page: Page;
+   8 |
+   9 |     /**
+  10 |      * Локатор для повідомлення про успішну авторизацію
+  11 |      */
+  12 |     private successMessage: Locator;
+  13 |
+  14 |     /**
+  15 |      * Конструктор класу DigestAuthPage
+  16 |      * @param page - об'єкт Playwright Page
+  17 |      */
+  18 |     constructor(page: Page) {
+  19 |         this.page = page;
+  20 |         this.successMessage = page.locator('div.example p');
+  21 |     }
+  22 |
+  23 |     /**
+  24 |      * Перехід на сторінку Digest Auth з авторизацією
+  25 |      * @param username - Ім'я користувача
+  26 |      * @param password - Пароль
+  27 |      */
+  28 |     async goto(username: string, password: string): Promise<void> {
+  29 |         const authUrl = `https://${username}:${password}@the-internet.herokuapp.com/digest_auth`;
+  30 |         await this.page.goto(authUrl);
+  31 |     }
+  32 |
+  33 |     /**
+  34 |      * Перевіряє повідомлення про успішну авторизацію
+  35 |      */
+  36 |     async expectSuccessMessage(): Promise<void> {
+  37 |         const message = await this.successMessage.textContent();
+  38 |         expect(message).toContain('Congratulations! You must have the proper credentials.');
+  39 |     }
+  40 |
+  41 |     /**
+  42 |      * Перевіряє статус-код при неправильних даних (401)
+  43 |      * @param username - Ім'я користувача
+  44 |      * @param password - Пароль
+  45 |      */
+  46 |     async expectUnauthorized(username: string, password: string): Promise<void> {
+  47 |         const authUrl = `https://${username}:${password}@the-internet.herokuapp.com/digest_auth`;
+  48 |
+> 49 |         const response = await this.page.goto(authUrl);
+     |                                          ^ Error: page.goto: net::ERR_INVALID_AUTH_CREDENTIALS at https://invalid:invalid@the-internet.herokuapp.com/digest_auth
+  50 |         expect(response?.status()).toBe(401);
+  51 |     }
+  52 | }
+  53 |
+```
