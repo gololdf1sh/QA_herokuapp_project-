@@ -1,47 +1,36 @@
-import { expect, Page, Locator } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
+/**
+ * Клас для взаємодії зі сторінкою Typos
+ */
 export class TyposPage {
     readonly page: Page;
-    readonly paragraphLocator: Locator;
+
+    private paragraph: Locator;
 
     constructor(page: Page) {
         this.page = page;
-        this.paragraphLocator = page.locator('div.example p:nth-child(2)');
+        this.paragraph = page.locator('.example p').nth(1);
     }
 
-    // Перехід на сторінку
-    async goto() {
+    async goto(): Promise<void> {
         await this.page.goto('https://the-internet.herokuapp.com/typos');
     }
 
-    // Отримати текст з другого параграфу
-    async getSecondParagraphText(): Promise<string> {
-        return await this.paragraphLocator.innerText();
+    async getParagraphText(): Promise<string> {
+        return await this.paragraph.innerText();
     }
 
     /**
-     * Перевірка правильного тексту з кількома спробами
-     * @param retries - кількість спроб
+     * Перевірка, що текст абзацу відповідає одному з допустимих варіантів
+     * @param expectedTexts Масив можливих коректних текстів
      */
-    async waitForCorrectText(retries: number = 10): Promise<{ success: boolean; lastText: string }> {
-        const expectedText = `Sometimes you'll see a typo, other times you won't.`;
-        let lastText = '';
+    async expectCorrectedText(expectedTexts: string[]): Promise<void> {
+        const actualText = await this.getParagraphText();
 
-        for (let i = 1; i <= retries; i++) {
-            lastText = await this.getSecondParagraphText();
-
-            console.log(`📝 Attempt ${i}: "${lastText}"`);
-
-            if (lastText.trim() === expectedText) {
-                console.log(`✅ Correct text found on attempt ${i}`);
-                return { success: true, lastText };
-            }
-
-            // Перезавантажуємо сторінку для нової спроби
-            await this.page.reload();
-        }
-
-        console.warn(`❌ Text did not match after ${retries} attempts. Last attempt: "${lastText}"`);
-        return { success: false, lastText };
+        expect(
+            expectedTexts,
+            'Текст не входить до списку припустимих варіантів'
+        ).toContain(actualText.trim());
     }
 }

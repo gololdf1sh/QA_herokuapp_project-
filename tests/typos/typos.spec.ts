@@ -4,26 +4,29 @@ import { TyposPage } from '../../src/pages/TyposPage.page';
 test.describe('Typos Page', () => {
     let typosPage: TyposPage;
 
+    const expectedTexts = [
+        "Sometimes you'll see a typo, other times you won’t.",
+        "Sometimes you'll see a typo, other times you won't."
+    ];
+
     test.beforeEach(async ({ page }) => {
         typosPage = new TyposPage(page);
-        await typosPage.goto();
+
+        await test.step('Перейти на сторінку Typos', async () => {
+            await typosPage.goto();
+        });
     });
 
-    test('Користувач бачить правильний текст без помилок', async () => {
-        const retries = 10; // скільки разів пробувати
-        const result = await typosPage.waitForCorrectText(retries);
-
-        // Якщо текст не співпав, фіксуємо проблему, але тест не падає
-        if (!result.success) {
-            console.warn(`⚠️ Тест пройшов з помилкою у тексті: "${result.lastText}"`);
-            // Можна зробити screenshot або attach до Allure
-            // await typosPage.page.screenshot({ path: 'screenshots/typos-fail.png' });
-        }
-
-        // Soft-assert: тест не падає, але ми бачимо що щось пішло не так
-        test.info().annotations.push({
-            type: 'info',
-            description: `Перевірено ${retries} разів. Результат: ${result.lastText}`,
+    test('should display the correct paragraph text without typos', async () => {
+        await test.step('Перевірити текст абзацу на відповідність допустимим варіантам', async () => {
+            await typosPage.expectCorrectedText(expectedTexts);
         });
+
+        /**
+         * Очікуваний результат:
+         * На сторінці відображається один із варіантів тексту:
+         * - "Sometimes you'll see a typo, other times you won’t."
+         * - "Sometimes you'll see a typo, other times you won't."
+         */
     });
 });

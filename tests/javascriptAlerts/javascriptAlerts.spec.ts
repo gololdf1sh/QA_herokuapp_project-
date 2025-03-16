@@ -1,37 +1,82 @@
 import { test } from '@playwright/test';
 import { JavaScriptAlertsPage } from '../../src/pages/JavaScriptAlertsPage.page';
 
-test.describe('JavaScript Alerts', () => {
+/**
+ * Тестова сьют для перевірки роботи JavaScript Alert, Confirm та Prompt
+ */
+test.describe('JavaScript Alerts Page', () => {
     let alertsPage: JavaScriptAlertsPage;
 
     test.beforeEach(async ({ page }) => {
+        // Ініціалізація сторінки та перехід до неї перед кожним тестом
         alertsPage = new JavaScriptAlertsPage(page);
-        await alertsPage.goto();
+
+        await test.step('Перейти на сторінку JavaScript Alerts', async () => {
+            await alertsPage.goto();
+        });
     });
 
-    test('Alert: Користувач може прийняти повідомлення', async () => {
-        await alertsPage.triggerAlertAndAccept();
-        await alertsPage.assertResult('You successfully clicked an alert');
+    test('should accept JS Alert and display success message', async () => {
+        await test.step('Викликати та прийняти JS Alert', async () => {
+            // Викликаємо алерт, приймаємо його та перевіряємо результат
+            await alertsPage.triggerAlertAndExpectResult('You successfully clicked an alert');
+        });
+
+        /**
+         * Очікуваний результат:
+         * На сторінці з’являється текст "You successfully clicked an alert"
+         * Пояснення:
+         * Це означає, що alert був успішно оброблений і користувач його прийняв.
+         */
     });
 
-    test('Confirm: Користувач приймає підтвердження', async () => {
-        await alertsPage.triggerConfirm(true);
-        await alertsPage.assertResult('You clicked: Ok');
+    test('should accept JS Confirm and display confirmation message', async () => {
+        await test.step('Викликати JS Confirm і натиснути OK', async () => {
+            // Викликаємо confirm, приймаємо його та перевіряємо результат
+            await alertsPage.triggerConfirmAndExpectResult(true, 'You clicked: Ok');
+        });
+
+        /**
+         * Очікуваний результат:
+         * Текст "You clicked: Ok" підтверджує прийняття confirm.
+         */
     });
 
-    test('Confirm: Користувач відхиляє підтвердження', async () => {
-        await alertsPage.triggerConfirm(false);
-        await alertsPage.assertResult('You clicked: Cancel');
+    test('should dismiss JS Confirm and display cancel message', async () => {
+        await test.step('Викликати JS Confirm і натиснути Cancel', async () => {
+            // Викликаємо confirm, відхиляємо його та перевіряємо результат
+            await alertsPage.triggerConfirmAndExpectResult(false, 'You clicked: Cancel');
+        });
+
+        /**
+         * Очікуваний результат:
+         * Текст "You clicked: Cancel" означає, що користувач відхилив confirm.
+         */
     });
 
-    test('Prompt: Користувач вводить текст і приймає', async () => {
-        const text = 'Playwright test';
-        await alertsPage.triggerPrompt(text);
-        await alertsPage.assertResult(`You entered: ${text}`);
+    test('should accept JS Prompt with text and display entered text', async () => {
+        const inputText = 'Playwright test';
+
+        await test.step(`Викликати JS Prompt, ввести текст "${inputText}" і натиснути OK`, async () => {
+            // Викликаємо prompt, вводимо текст та перевіряємо результат
+            await alertsPage.triggerPromptAndExpectResult(inputText, `You entered: ${inputText}`);
+        });
+
+        /**
+         * Очікуваний результат:
+         * Текст "You entered: Playwright test" з'являється після введення тексту.
+         */
     });
 
-    test('Prompt: Користувач закриває prompt без вводу', async () => {
-        await alertsPage.triggerPrompt(null);
-        await alertsPage.assertResult('You entered: null');
+    test('should dismiss JS Prompt without entering text and display null message', async () => {
+        await test.step('Викликати JS Prompt і натиснути Cancel', async () => {
+            // Викликаємо prompt, не вводимо текст і відхиляємо prompt
+            await alertsPage.triggerPromptAndExpectResult(null, 'You entered: null');
+        });
+
+        /**
+         * Очікуваний результат:
+         * Текст "You entered: null" означає, що prompt було відхилено без введення даних.
+         */
     });
 });

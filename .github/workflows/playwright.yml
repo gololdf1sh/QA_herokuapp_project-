@@ -7,17 +7,18 @@ on:
     branches: [ main ]
 
 jobs:
-  playwright-ci:            # 👈 нова зрозуміла назва job
+  playwright-ci:
     runs-on: ubuntu-latest
+    timeout-minutes: 20      # Обмеження часу на ран
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Install dependencies
         run: npm ci
@@ -25,9 +26,11 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      - name: Run Playwright tests with Allure reporter
-        run: xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' npx playwright test --reporter=list,allure-playwright
-        continue-on-error: true
+      - name: Run Playwright tests with Allure reporter on 2 workers
+        run: |
+          xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' \
+          npx playwright test --reporter=list,allure-playwright --workers=2
+        continue-on-error: false  # ❗ Зупиняємо збірку, якщо тести впали
 
       - name: Install Allure CLI
         run: npm install -g allure-commandline@2.20.1

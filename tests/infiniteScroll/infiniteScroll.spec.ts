@@ -1,29 +1,40 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { InfiniteScrollPage } from '../../src/pages/InfiniteScrollPage.page';
 
+/**
+ * Тестова сьют для сторінки Infinite Scroll
+ */
 test.describe('Infinite Scroll Page', () => {
     let infiniteScrollPage: InfiniteScrollPage;
 
     test.beforeEach(async ({ page }) => {
         infiniteScrollPage = new InfiniteScrollPage(page);
-        await infiniteScrollPage.goto();
+
+        await test.step('Перейти на сторінку Infinite Scroll', async () => {
+            await infiniteScrollPage.goto();
+        });
     });
 
-    test('Завантажуються нові параграфи при прокручуванні', async () => {
-        const initialCount = await infiniteScrollPage.getParagraphsCount();
-        console.log(`Initial count: ${initialCount}`);
+    test('should load new paragraphs when scrolling down', async () => {
+        let initialCount: number;
+
+        await test.step('Отримати початкову кількість параграфів', async () => {
+            initialCount = await infiniteScrollPage.getParagraphsCount();
+        });
 
         const scrollTimes = 3;
         let currentExpectedCount = initialCount;
 
         for (let i = 1; i <= scrollTimes; i++) {
-            await infiniteScrollPage.scrollDown();
-            currentExpectedCount += 1; // додається 1 .jscroll-added елемент за scroll
-            await infiniteScrollPage.waitForNewParagraphs(currentExpectedCount);
-            console.log(`After scroll ${i}, paragraphs count: ${currentExpectedCount}`);
+            await test.step(`Скрол №${i}: скролимо і перевіряємо кількість параграфів`, async () => {
+                currentExpectedCount += 1; // очікуємо додавання одного параграфу після скролу
+
+                await infiniteScrollPage.scrollDownAndExpectParagraphs(1000, currentExpectedCount);
+            });
         }
 
-        const finalCount = await infiniteScrollPage.getParagraphsCount();
-        expect(finalCount).toBe(currentExpectedCount);
+        await test.step('Фінальна перевірка кількості параграфів після скролів', async () => {
+            await infiniteScrollPage.expectParagraphsCount(currentExpectedCount);
+        });
     });
 });
